@@ -11,32 +11,53 @@ GitHub 仓库名建议使用：`Agent-Obsidian-install`。
 
 ## 快速使用
 
-### macOS / Linux
+### 方式一：远程一行命令（推荐）
+
+类似 Homebrew / Rust / Bun 的体验，不需要手动判断系统、不需要解压、不需要找路径，**复制粘贴一行命令到终端即可**：
+
+#### macOS / Linux（终端 / Terminal）
 
 ```bash
-cd "/path/to/Agent-Obsidian-install"
-bash scripts/bootstrap.sh --cn
+curl -fsSL https://raw.githubusercontent.com/Daknniel-0881/Agent-Obsidian-install/main/install.sh | bash
 ```
 
-不使用国内 npm 镜像：
-
-```bash
-bash scripts/bootstrap.sh
-```
-
-### Windows PowerShell
-
-先执行一次安全策略解锁：
+#### Windows（PowerShell，建议右键"以管理员身份运行"）
 
 ```powershell
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+irm https://raw.githubusercontent.com/Daknniel-0881/Agent-Obsidian-install/main/install.ps1 | iex
 ```
 
-再运行：
+入口脚本会自动按以下顺序定位完整安装包：
 
-```powershell
-cd "D:\你的部署包目录"
-.\scripts\bootstrap.ps1 -ChinaMirror
+1. **优先**：`~/Downloads/自动部署脚本/`（已解压目录）
+2. **其次**：`~/Downloads/自动部署脚本.zip` / `Agent-Obsidian-install.zip`（自动解压）
+3. **兜底**：从 GitHub `git clone`（不含离线包，回退在线下载依赖）
+
+为达到最佳体验，建议先把完整 zip（含 `离线安装包/`）下载到 `~/Downloads/`，再跑上面的一行命令。
+
+### 方式二：本地双击入口（已下载完整包）
+
+适合已经把完整 `自动部署脚本/` 目录或 zip 解压到本地的情况：
+
+| 系统 | 入口文件 |
+|------|----------|
+| macOS | 双击 `Mac系统/install-mac.command` |
+| Windows | 右键 `Win系统/install-windows.bat` → 以管理员身份运行 |
+| Linux | 终端运行 `bash scripts/bootstrap.sh` |
+
+### 方式三：手动调用主脚本（高级）
+
+```bash
+# macOS / Linux
+bash scripts/bootstrap.sh --cn         # 启用国内 npm 镜像
+bash scripts/bootstrap.sh              # 不启用镜像
+bash scripts/bootstrap.sh --dry-run    # 干跑模式，不实际写文件
+
+# Windows PowerShell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+.\scripts\bootstrap.ps1 -ChinaMirror   # 启用国内 npm 镜像
+.\scripts\bootstrap.ps1 -DryRun        # 干跑模式
 ```
 
 ## 推荐机制

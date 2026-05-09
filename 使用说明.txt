@@ -12,6 +12,41 @@
   装完后，你就有一台「Agent + 知识库 + 自动化」的工作机。
 
 ───────────────────────────────────────────────────────────────
+【★ 最快路径 · 一行命令（推荐）★】
+───────────────────────────────────────────────────────────────
+
+  类似 Homebrew、Rust、Bun 的安装体验：复制粘贴一行命令到终端
+  即可自动完成。脚本会自动判断你的系统、找到本地安装包、跑对
+  应平台脚本，全程不用你手动操作。
+
+  ★ Mac / Linux ★
+  打开"终端"（Mac: 启动台搜索"Terminal"），粘贴下面这行：
+
+    curl -fsSL https://raw.githubusercontent.com/Daknniel-0881/Agent-Obsidian-install/main/install.sh | bash
+
+  ★ Windows ★
+  右键"开始"→ 选"终端（管理员）" 或 "PowerShell（管理员）"，
+  先跑一次解锁策略：
+
+    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+
+  再粘贴下面这行：
+
+    irm https://raw.githubusercontent.com/Daknniel-0881/Agent-Obsidian-install/main/install.ps1 | iex
+
+  自动行为（无需你介入）：
+    1. 检测你的系统（Mac / Linux / Windows + ARM / Intel）
+    2. 三级查找完整安装包：
+       ① 如果 ~/Downloads/自动部署脚本/ 已存在 → 直接用
+       ② 否则找 ~/Downloads/自动部署脚本.zip → 自动解压
+       ③ 都没有 → 从 GitHub 克隆（不含离线包，回退在线下载）
+    3. 调用对应平台脚本完成全部安装
+
+  ※ 为达到最佳体验（特别是国内网络），建议先把完整 zip 包
+    （含【离线安装包/】，约 200MB）下载到 ~/Downloads/，再
+    跑上面的一行命令。zip 下载地址见 GitHub 仓库 README。
+
+───────────────────────────────────────────────────────────────
 【准备工作 · 把文件夹放对位置】
 ───────────────────────────────────────────────────────────────
 
