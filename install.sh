@@ -85,11 +85,14 @@ extract_zip() {
 }
 
 # 从 GitHub Release 下载分平台 zip
+# Release asset 用 ASCII 名（GitHub 不支持非 ASCII 文件名）
+# 本地输出仍用中文名（便于客户辨识）
 download_from_release() {
-  local ZIP_NAME="${DIST_NAME}-${ZIP_PLATFORM}.zip"
-  local URL="${RELEASE_BASE}/${ZIP_NAME}"
-  local OUT="$DOWNLOADS_DIR/${ZIP_NAME}"
-  log "[路径③] 从 GitHub Release 下载: $ZIP_NAME"
+  local RELEASE_ASSET="Agent-Obsidian-install-${ZIP_PLATFORM}.zip"
+  local LOCAL_NAME="${DIST_NAME}-${ZIP_PLATFORM}.zip"
+  local URL="${RELEASE_BASE}/${RELEASE_ASSET}"
+  local OUT="$DOWNLOADS_DIR/${LOCAL_NAME}"
+  log "[路径③] 从 GitHub Release 下载: $RELEASE_ASSET"
   log "URL: $URL"
   log "（首次下载约 350-680MB，含完整离线安装包，请耐心等待）"
   if ! command -v curl >/dev/null 2>&1; then

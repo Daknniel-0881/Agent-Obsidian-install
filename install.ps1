@@ -84,11 +84,14 @@ function Expand-DistZip {
 }
 
 # 从 GitHub Release 下载分平台 zip
+# Release asset 用 ASCII 名（GitHub 不支持非 ASCII 文件名）
+# 本地输出仍用中文名（便于客户辨识）
 function Get-FromRelease {
-  $zipName = "$DistName-$ZipPlatform.zip"
-  $url     = "$ReleaseBase/$zipName"
-  $out     = Join-Path $DownloadsDir $zipName
-  Write-Log "[路径③] 从 GitHub Release 下载: $zipName"
+  $releaseAsset = "Agent-Obsidian-install-$ZipPlatform.zip"
+  $localName    = "$DistName-$ZipPlatform.zip"
+  $url          = "$ReleaseBase/$releaseAsset"
+  $out          = Join-Path $DownloadsDir $localName
+  Write-Log "[路径③] 从 GitHub Release 下载: $releaseAsset"
   Write-Log "URL: $url"
   Write-Log "（首次下载约 680MB，含完整离线安装包，请耐心等待）"
   try {
