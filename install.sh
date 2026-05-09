@@ -9,16 +9,20 @@
 #
 # 自动行为：
 #   1. 探测 OS（Darwin / Linux）和架构（arm64 / x86_64）
-#   2. 三级查找完整安装包：
-#      ① ~/Downloads/自动部署脚本/   （已解压目录，优先）
-#      ② ~/Downloads/自动部署脚本.zip （压缩包，自动解压）
-#      ③ git clone GitHub 仓库       （兜底，无离线包）
+#   2. 四级查找完整安装包：
+#      ① ~/Downloads/自动部署脚本/                    （已解压目录，优先）
+#      ② ~/Downloads/自动部署脚本-{Mac|Linux}.zip      （分平台压缩包，自动解压）
+#      ③ GitHub Release 自动下载分平台 zip            （含离线包，~350-680MB）
+#      ④ git clone GitHub 仓库                        （最后兜底，不含离线包）
 #   3. 调用对应平台脚本（scripts/bootstrap.sh）
 # =============================================================================
 set -Eeuo pipefail
 
-REPO_URL="https://github.com/Daknniel-0881/Agent-Obsidian-install.git"
+REPO_OWNER="Daknniel-0881"
+REPO_NAME="Agent-Obsidian-install"
+REPO_URL="https://github.com/${REPO_OWNER}/${REPO_NAME}.git"
 REPO_BRANCH="main"
+RELEASE_BASE="https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/latest/download"
 DIST_NAME="自动部署脚本"
 DOWNLOADS_DIR="${DOWNLOADS_DIR:-$HOME/Downloads}"
 TARGET_DIR="$DOWNLOADS_DIR/$DIST_NAME"
@@ -41,8 +45,8 @@ detect_system() {
   OS_NAME="$(uname -s)"
   ARCH_NAME="$(uname -m)"
   case "$OS_NAME" in
-    Darwin) OS_LABEL="macOS" ;;
-    Linux)  OS_LABEL="Linux" ;;
+    Darwin) OS_LABEL="macOS"; ZIP_PLATFORM="Mac" ;;
+    Linux)  OS_LABEL="Linux"; ZIP_PLATFORM="Linux" ;;
     *)      fail "不支持的系统: $OS_NAME（仅支持 macOS / Linux，Windows 用户请用 install.ps1）" ;;
   esac
   case "$ARCH_NAME" in
@@ -51,6 +55,7 @@ detect_system() {
     *)             ARCH_LABEL="$ARCH_NAME（未识别，按 x86_64 处理）" ;;
   esac
   log "检测系统: $OS_LABEL / $ARCH_LABEL"
+  log "目标分平台 zip: ${DIST_NAME}-${ZIP_PLATFORM}.zip"
 }
 
 # 检查必要的命令
@@ -66,7 +71,39 @@ check_prereq() {
   done
 }
 
-# 三级回退查找/获取分发包
+# 解压 zip 到 $DOWNLOADS_DIR/，并归一化目录名为 $TARGET_DIR
+extract_zip() {
+  local ZIP="$1"
+  log "解压到: $DOWNLOADS_DIR/"
+  check_prereq
+  unzip -q -o "$ZIP" -d "$DOWNLOADS_DIR/"
+  # 归一化：① GitHub source zip 解压成 Agent-Obsidian-install-main/
+  if [[ -d "$DOWNLOADS_DIR/Agent-Obsidian-install-main" && ! -d "$TARGET_DIR" ]]; then
+    mv "$DOWNLOADS_DIR/Agent-Obsidian-install-main" "$TARGET_DIR"
+  fi
+  [[ -d "$TARGET_DIR/scripts" ]] || fail "解压后未找到 scripts/ 目录，zip 可能损坏"
+}
+
+# 从 GitHub Release 下载分平台 zip
+download_from_release() {
+  local ZIP_NAME="${DIST_NAME}-${ZIP_PLATFORM}.zip"
+  local URL="${RELEASE_BASE}/${ZIP_NAME}"
+  local OUT="$DOWNLOADS_DIR/${ZIP_NAME}"
+  log "[路径③] 从 GitHub Release 下载: $ZIP_NAME"
+  log "URL: $URL"
+  log "（首次下载约 350-680MB，含完整离线安装包，请耐心等待）"
+  if ! command -v curl >/dev/null 2>&1; then
+    fail "未安装 curl，无法下载。请先安装 curl 或手动下载 zip 到 $DOWNLOADS_DIR/"
+  fi
+  if ! curl -fL --progress-bar -o "$OUT" "$URL"; then
+    rm -f "$OUT"
+    return 1
+  fi
+  extract_zip "$OUT"
+  log "Release 下载 + 解压完成"
+}
+
+# 四级回退查找/获取分发包
 locate_or_fetch_dist() {
   # ① 已解压目录
   if [[ -d "$TARGET_DIR/scripts" ]]; then
@@ -74,31 +111,32 @@ locate_or_fetch_dist() {
     return 0
   fi
 
-  # ② 找 zip 解压
+  # ② 找本地 zip（分平台优先 → 通用 fallback）
   local zip_candidates=(
+    "$DOWNLOADS_DIR/${DIST_NAME}-${ZIP_PLATFORM}.zip"
+    "$DOWNLOADS_DIR/${DIST_NAME}-$(echo "$ZIP_PLATFORM" | tr '[:upper:]' '[:lower:]').zip"
     "$DOWNLOADS_DIR/$DIST_NAME.zip"
     "$DOWNLOADS_DIR/Agent-Obsidian-install.zip"
     "$DOWNLOADS_DIR/agent-obsidian-install.zip"
   )
   for ZIP in "${zip_candidates[@]}"; do
     if [[ -f "$ZIP" ]]; then
-      log "[路径②] 找到压缩包: $ZIP"
-      log "解压到: $DOWNLOADS_DIR/"
-      check_prereq
-      unzip -q -o "$ZIP" -d "$DOWNLOADS_DIR/"
-      # 解压后可能是 自动部署脚本/ 或 Agent-Obsidian-install-main/，做一次归一化
-      if [[ -d "$DOWNLOADS_DIR/Agent-Obsidian-install-main" && ! -d "$TARGET_DIR" ]]; then
-        mv "$DOWNLOADS_DIR/Agent-Obsidian-install-main" "$TARGET_DIR"
-      fi
-      [[ -d "$TARGET_DIR/scripts" ]] && return 0
-      fail "解压后未找到 scripts/ 目录，zip 可能损坏"
+      log "[路径②] 找到本地压缩包: $ZIP"
+      extract_zip "$ZIP"
+      return 0
     fi
   done
 
-  # ③ git clone 兜底
-  log "[路径③] 本地未找到分发包，从 GitHub 克隆..."
+  # ③ 从 GitHub Release 下载分平台 zip
+  if download_from_release; then
+    return 0
+  fi
+  log "Release 下载失败，回退到 git clone..."
+
+  # ④ git clone 最后兜底
+  log "[路径④] 从 GitHub 克隆仓库..."
   if ! command -v git >/dev/null 2>&1; then
-    fail "未安装 git，无法 clone。请先下载 zip 到 $DOWNLOADS_DIR/ 再重试"
+    fail "未安装 git 也下载不到 Release zip。请检查网络或手动下载 zip 到 $DOWNLOADS_DIR/"
   fi
   git clone --depth 1 -b "$REPO_BRANCH" "$REPO_URL" "$TARGET_DIR" \
     || fail "git clone 失败，请检查网络（或手动下载 zip 放到 $DOWNLOADS_DIR/）"
