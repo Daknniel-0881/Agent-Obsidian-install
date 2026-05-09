@@ -1,0 +1,322 @@
+═══════════════════════════════════════════════════════════════
+  CodePilot + Obsidian + Claude Code 一键部署套件
+  使 用 说 明 · 曲率出品
+═══════════════════════════════════════════════════════════════
+
+【这是什么】
+  这套脚本帮你在一台新电脑上 30 分钟内完成：
+    1. Claude Code 命令行（AI Agent 引擎）
+    2. CodePilot 客户端（Claude Code 图形界面）
+    3. Obsidian 笔记（你的知识库）
+    4. 飞书 CLI、知识库管理 Skill 等基础组件
+  装完后，你就有一台「Agent + 知识库 + 自动化」的工作机。
+
+───────────────────────────────────────────────────────────────
+【准备工作 · 把文件夹放对位置】
+───────────────────────────────────────────────────────────────
+
+  把整个【自动部署脚本】文件夹（就是你现在看到的这个）放到：
+
+    Mac：       ~/Downloads（即"下载"目录）   ← 推荐
+                或桌面
+    Windows：   C:\Users\你的用户名\Downloads\自动部署脚本   ← 推荐
+                或 C:\自动部署脚本
+                或 D:\自动部署脚本
+                或 桌面
+    Linux：     ~/Downloads
+                或 ~/Desktop
+
+  脚本会按这个顺序自动搜索安装包，找不到才会报错。
+
+───────────────────────────────────────────────────────────────
+【最简单方式：双击入口（推荐给客户）】
+───────────────────────────────────────────────────────────────
+
+  系统                          双击入口
+  ────────────────────────────  ──────────────────────────────
+  Mac（M1/M2/M3/M4 芯片）        Mac系统/install-mac.command
+  Mac（Intel 芯片）              Mac系统/install-mac.command
+  Windows 10 / 11               Win系统/install-windows.bat
+  Linux Ubuntu/Debian (amd64)   终端运行 bash scripts/install-linux.sh
+  Linux 树莓派/服务器 (arm64)    终端运行 bash scripts/install-linux.sh
+
+  ※ 脚本会自动识别 ARM/Intel 子架构、自动选择对应安装包，
+    不用你手动判断。
+
+  Mac 双击操作：
+    ① 打开【自动部署脚本】→【Mac系统】
+    ② 双击 install-mac.command
+    ③ 系统弹"无法打开" → 系统设置 > 隐私与安全性 > 滑到底部
+       看到"已阻止 install-mac.command" → 点【仍要打开】
+    ④ 输入开机密码（终端不显示，正常输入）
+    ⑤ 等待 15-30 分钟，看到"安装完成"提示即结束
+
+  Windows 双击操作：
+    ① 打开【自动部署脚本】→【Win系统】
+    ② 右键 install-windows.bat → 以管理员身份运行
+    ③ 弹出"用户账户控制" → 点【是】
+    ④ 等待 15-30 分钟，看到"安装完成"提示即结束
+
+───────────────────────────────────────────────────────────────
+【一、不同系统用哪个脚本？（手动方式 · 进阶用户）】
+───────────────────────────────────────────────────────────────
+
+  1. Mac 电脑
+
+  使用：
+
+    scripts/install-macos.sh
+
+  在"终端"里执行：
+
+    cd ~/Downloads/自动部署脚本
+    bash scripts/install-macos.sh --cn
+
+  说明：
+
+  - M 芯片和 Intel 芯片不用客户判断，脚本会自动识别。
+  - M 芯片会安装 Mac系统/CodePilot-0.54.0-arm64.dmg。
+  - Intel 芯片会安装 Mac系统/CodePilot-0.54.0-x64.dmg。
+  - Obsidian 会安装 Mac系统/Obsidian-1.12.7.dmg。
+
+
+  2. Windows 电脑
+
+  使用：
+
+    scripts\bootstrap.ps1
+
+  在"PowerShell"里执行：
+
+    cd "$env:USERPROFILE\Downloads\自动部署脚本"
+    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+    .\scripts\bootstrap.ps1 -ChinaMirror
+
+  如果文件夹放在 C 盘根目录，则执行：
+
+    cd C:\自动部署脚本
+    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+    .\scripts\bootstrap.ps1 -ChinaMirror
+
+  说明：
+
+  - Windows 必须用 PowerShell，不要用 cmd。
+  - 如果弹出 SmartScreen，点"更多信息"，再点"仍要运行"。
+  - 工作目录优先创建在 D:\CodePilot；如果没有 D 盘，就创建在桌面。
+
+
+  3. Linux 电脑
+
+  使用：
+
+    scripts/install-linux.sh
+
+  在终端里执行：
+
+    cd ~/Downloads/自动部署脚本
+    bash scripts/install-linux.sh --cn
+
+  说明：
+
+  - amd64 会安装 Linux系统/CodePilot-0.54.0-amd64.deb。
+  - arm64 会安装 Linux系统/CodePilot-0.54.0-arm64.deb。
+  - 当前 Obsidian 只放了 amd64 deb；如果是 arm64 Linux，需要补 Obsidian arm64 安装包。
+
+
+───────────────────────────────────────────────────────────────
+【二、脚本会自动做什么？】
+───────────────────────────────────────────────────────────────
+
+  脚本会自动执行：
+
+  1. 安装 Git、Node.js、Claude Code、Lark CLI。
+  2. 安装 CodePilot 客户端。
+  3. 安装 Obsidian 客户端。
+  4. 创建 CodePilot 工作目录。
+  5. 创建 Obsidian 知识库目录（PARA 8 层结构）。
+  6. 写入 CLAUDE.md 规则文件。
+  7. 安装基础 Skills（28 个核心 Skill）。
+  8. 设置电脑尽量 24 小时在线。
+
+
+───────────────────────────────────────────────────────────────
+【三、脚本不会自动做什么？】
+───────────────────────────────────────────────────────────────
+
+  这些必须由客户自己完成：
+
+  ◆ 必做 #1：填 API Key
+
+  打开 CodePilot 后：
+
+    左下角【设置】图标 → 选【服务商】(Anthropic / OpenRouter / 其他)
+    → 选类型 → 粘贴 API Key → 保存
+
+  脚本不会保存、读取或代填客户 API Key。
+
+
+  ◆ 必做 #2：开启 Obsidian 命令行界面
+
+  打开 Obsidian 后：
+
+    左下角齿轮设置 → 关于/通用 → 高级
+    → 命令行界面 → 开启 → 注册
+
+  然后在终端验证：
+
+    obsidian help
+
+
+  ◆ 选做 #3：飞书 Lark CLI 授权（如要用飞书功能）
+
+  脚本只安装 Lark CLI，不预填飞书应用，也不代替客户授权。
+
+  客户需要用飞书功能时，再自己执行：
+
+    lark auth login
+
+  浏览器自动打开 → 用企业飞书账号登录授权。
+
+
+───────────────────────────────────────────────────────────────
+【四、离线安装包怎么放？】
+───────────────────────────────────────────────────────────────
+
+  目录结构：
+
+    自动部署脚本/
+    ├── Mac系统/                  ← CodePilot + Obsidian dmg
+    ├── Win系统/                  ← CodePilot + Obsidian exe
+    ├── Linux系统/                ← CodePilot + Obsidian deb
+    └── 离线安装包/                ← Git/Node/Homebrew 离线包
+        ├── mac/                  ← Mac 用 (pkg/tar.gz)
+        ├── windows/              ← Win 用 (exe/msi)
+        ├── linux/                ← Linux 用 (deb)
+        └── npm/                  ← npm tarball (.tgz)
+
+  Claude Code 和 Lark CLI 的 npm 离线包放在：
+
+    自动部署脚本/离线安装包/npm/
+
+  命名示例：
+
+    anthropic-ai-claude-code-*.tgz
+    larksuite-cli-*.tgz
+
+  Git、Node.js 离线包放在对应系统目录里：
+
+    mac/git-*.pkg
+    mac/node-v*-darwin-*.pkg
+    mac/homebrew-*.tar.gz
+    windows/Git-*.exe
+    windows/node-v*-x64.msi
+    linux/git*.deb
+    linux/nodejs_*.deb
+
+  脚本会先找离线包，找不到才尝试联网安装。
+
+  脚本会自动检测：
+    联网 + 有 离线包/  → 优先在线（保证版本最新）
+    联网 + 无 离线包/  → 在线
+    断网 + 有 离线包/  → 自动切换离线模式
+    断网 + 无 离线包/  → 报错，提示你联网或要离线包
+
+  你不需要做任何选择，脚本自己判断。
+
+  快速生成离线包：参见 tools/README.md（里面有 download-offline.sh
+  和 download-offline.ps1，自动从官方源下载）。
+
+
+───────────────────────────────────────────────────────────────
+【五、能不能直接复制已经装好的 Git、Node、Homebrew？】
+───────────────────────────────────────────────────────────────
+
+  不建议。
+
+  原因：
+
+  1. Homebrew 路径和机器架构绑定很重，直接复制到客户电脑很容易坏。
+  2. Node.js 如果是 Homebrew 安装的，里面很多路径也是本机路径。
+  3. Git 在 Mac 上常常是系统自带或 Xcode Command Line Tools 提供，
+     不能简单打包复制。
+  4. Windows 和 Linux 更不能直接拿 Mac 上的环境复制过去。
+
+  更稳的方式是准备官方离线安装包：
+
+  - Git：官方 exe/pkg/deb
+  - Node.js：官方 msi/pkg/deb 或安装包
+  - Claude Code：npm pack 生成 tgz
+  - Lark CLI：npm pack 生成 tgz
+
+  → 直接跑 tools/download-offline.sh 或 tools/download-offline.ps1
+    自动从官方源下载到「离线安装包/」对应目录。
+
+
+───────────────────────────────────────────────────────────────
+【六、中国大陆网络环境 · 已自动处理】
+───────────────────────────────────────────────────────────────
+
+  脚本已内置自动镜像切换：
+    GitHub 访问超时 → 自动切到 USTC 镜像
+    npm 访问超时    → 自动切到 npmmirror 镜像
+    Homebrew 慢     → 自动切到清华源
+
+  你不需要做任何额外操作。
+
+
+───────────────────────────────────────────────────────────────
+【七、安装失败怎么办？】
+───────────────────────────────────────────────────────────────
+
+  ① 先看终端最后几行红色错误信息
+  ② 打开同目录下的【安装失败常见问题.txt】对照排查
+  ③ 还搞不定？把日志发给管理员：
+
+  Mac/Linux 日志：~/.claude/logs/install-*.log
+  Windows  日志：%USERPROFILE%\.claude\logs\install-*.log
+
+  示例：
+
+    logs/install-macos-20260509-165213.log
+    logs/install-windows-20260509-165213.log
+    logs/install-linux-20260509-165213.log
+
+
+───────────────────────────────────────────────────────────────
+【八、安装后怎么验收？】
+───────────────────────────────────────────────────────────────
+
+  终端执行：
+
+    node --version
+    npm --version
+    claude --version
+    lark --version
+
+  Obsidian CLI 打开后执行：
+
+    obsidian help
+
+  最后在 CodePilot 里让 Agent 测试：
+
+    请创建一条测试笔记，保存到知识库的 00-Inbox，标题为"部署验证测试"。
+
+  如果 Obsidian 知识库里出现这条笔记，说明部署基本成功。
+
+
+───────────────────────────────────────────────────────────────
+【九、关于 24 小时待机】
+───────────────────────────────────────────────────────────────
+
+  Agent 工作流需要电脑保持唤醒状态，脚本会自动设置：
+    Mac：    防止睡眠（caffeinate / pmset）
+    Windows：关闭显示器休眠 + 不进入睡眠
+
+  设置完后电脑不会断网或自动锁屏，但屏幕到时间会熄灭，
+  这是正常的（按任意键唤醒）。
+
+
+═══════════════════════════════════════════════════════════════
+  脚本版本：v0.2.0
+  曲率出品 · 持续进化中
+═══════════════════════════════════════════════════════════════
