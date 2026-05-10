@@ -9,6 +9,25 @@ GitHub 仓库名：`qulv-agent-obsidian-install`。
 - 自动化：Claude Code skills、Obsidian CLI、Lark CLI
 - 系统：macOS、Windows、Linux
 
+---
+
+## 关于作者
+
+这个开源工具来自我们的企业 AI 服务实践——
+
+我们核心提供**企业 AI 服务**，具体业务包括：
+
+1. **企业 AI 培训**
+2. **企业 AI 转型咨询**
+3. **落地工具搭建、AI 工具定制及 Skill 定制**
+4. **企业 AI 转型全程陪跑**
+
+感兴趣可扫码添加微信 👇
+
+![扫码添加微信](./assets/poster.png)
+
+---
+
 ## 快速使用
 
 ### 方式一：远程一行命令（推荐）
@@ -246,11 +265,3 @@ obsidian help
 ```
 
 最后在 CodePilot 中打开工作目录，确认 Claude Code 启动后能读到 `CLAUDE.md`，并能按要求把内容保存到 Obsidian vault。
-
-## 关于本仓库与曲率企业 AI 服务
-
-本仓库开源分享 **qulv-agent-obsidian-install**：跨平台一键部署 Agent、Obsidian 与自动化环境的安装包，让团队能更快搭起可复用的 AI 工作台。曲率提供企业 AI 培训、企业 AI 转型咨询、落地工具搭建、AI 工具定制及 Skill 定制、企业 AI 转型全程陪跑，帮助团队把 AI 从演示样例落到真实业务流程中。
-
-感兴趣可扫码添加微信：
-
-![曲率企业 AI 服务海报](assets/qulv/qulv-ai-business-poster-readme.png)
