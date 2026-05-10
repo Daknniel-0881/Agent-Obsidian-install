@@ -5,7 +5,7 @@
 # 业界标准的"一行命令"安装入口（参考 Homebrew / Rust / Bun）
 # 客户在终端粘贴下面这条命令即可触发完整安装：
 #
-#   curl -fsSL https://raw.githubusercontent.com/Daknniel-0881/Agent-Obsidian-install/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/Daknniel-0881/qulv-agent-obsidian-install/main/install.sh | bash
 #
 # 自动行为：
 #   1. 探测 OS（Darwin / Linux）和架构（arm64 / x86_64）
@@ -19,7 +19,7 @@
 set -Eeuo pipefail
 
 REPO_OWNER="Daknniel-0881"
-REPO_NAME="Agent-Obsidian-install"
+REPO_NAME="qulv-agent-obsidian-install"
 REPO_URL="https://github.com/${REPO_OWNER}/${REPO_NAME}.git"
 REPO_BRANCH="main"
 RELEASE_BASE="https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/latest/download"
@@ -77,10 +77,13 @@ extract_zip() {
   log "解压到: $DOWNLOADS_DIR/"
   check_prereq
   unzip -q -o "$ZIP" -d "$DOWNLOADS_DIR/"
-  # 归一化：① GitHub source zip 解压成 Agent-Obsidian-install-main/
-  if [[ -d "$DOWNLOADS_DIR/Agent-Obsidian-install-main" && ! -d "$TARGET_DIR" ]]; then
-    mv "$DOWNLOADS_DIR/Agent-Obsidian-install-main" "$TARGET_DIR"
-  fi
+  # 归一化：GitHub source zip 解压成 <repo>-main/
+  for SOURCE_ROOT in "$DOWNLOADS_DIR/qulv-agent-obsidian-install-main" "$DOWNLOADS_DIR/Agent-Obsidian-install-main"; do
+    if [[ -d "$SOURCE_ROOT" && ! -d "$TARGET_DIR" ]]; then
+      mv "$SOURCE_ROOT" "$TARGET_DIR"
+      break
+    fi
+  done
   [[ -d "$TARGET_DIR/scripts" ]] || fail "解压后未找到 scripts/ 目录，zip 可能损坏"
 }
 
@@ -119,6 +122,7 @@ locate_or_fetch_dist() {
     "$DOWNLOADS_DIR/${DIST_NAME}-${ZIP_PLATFORM}.zip"
     "$DOWNLOADS_DIR/${DIST_NAME}-$(echo "$ZIP_PLATFORM" | tr '[:upper:]' '[:lower:]').zip"
     "$DOWNLOADS_DIR/$DIST_NAME.zip"
+    "$DOWNLOADS_DIR/qulv-agent-obsidian-install.zip"
     "$DOWNLOADS_DIR/Agent-Obsidian-install.zip"
     "$DOWNLOADS_DIR/agent-obsidian-install.zip"
   )

@@ -4,7 +4,7 @@
 # 业界标准的"一行命令"安装入口
 # 客户在 PowerShell 粘贴下面这条命令即可触发完整安装：
 #
-#   irm https://raw.githubusercontent.com/Daknniel-0881/Agent-Obsidian-install/main/install.ps1 | iex
+#   irm https://raw.githubusercontent.com/Daknniel-0881/qulv-agent-obsidian-install/main/install.ps1 | iex
 #
 # 自动行为：
 #   1. 探测架构（ARM64 / x64）
@@ -22,7 +22,7 @@ $ErrorActionPreference = "Stop"
 $OutputEncoding = [System.Text.Encoding]::UTF8
 
 $RepoOwner     = "Daknniel-0881"
-$RepoName      = "Agent-Obsidian-install"
+$RepoName      = "qulv-agent-obsidian-install"
 $RepoUrl       = "https://github.com/$RepoOwner/$RepoName.git"
 $RepoBranch    = "main"
 $ReleaseBase   = "https://github.com/$RepoOwner/$RepoName/releases/latest/download"
@@ -74,9 +74,15 @@ function Expand-DistZip {
     Fail "解压失败: $_"
   }
   # 归一化目录名（GitHub source zip 通常解压成 <repo>-main/）
-  $maybeRoot = Join-Path $DownloadsDir "Agent-Obsidian-install-main"
-  if ((Test-Path $maybeRoot) -and (-not (Test-Path $TargetDir))) {
-    Move-Item $maybeRoot $TargetDir
+  $sourceRoots = @(
+    Join-Path $DownloadsDir "qulv-agent-obsidian-install-main"
+    Join-Path $DownloadsDir "Agent-Obsidian-install-main"
+  )
+  foreach ($maybeRoot in $sourceRoots) {
+    if ((Test-Path $maybeRoot) -and (-not (Test-Path $TargetDir))) {
+      Move-Item $maybeRoot $TargetDir
+      break
+    }
   }
   if (-not (Test-Path (Join-Path $TargetDir "scripts"))) {
     Fail "解压后未找到 scripts/ 目录，zip 可能损坏"
@@ -121,6 +127,7 @@ function Find-Or-FetchDist {
     Join-Path $DownloadsDir "$DistName-$ZipPlatform.zip"
     Join-Path $DownloadsDir "$DistName-$($ZipPlatform.ToLower()).zip"
     Join-Path $DownloadsDir "$DistName.zip"
+    Join-Path $DownloadsDir "qulv-agent-obsidian-install.zip"
     Join-Path $DownloadsDir "Agent-Obsidian-install.zip"
     Join-Path $DownloadsDir "agent-obsidian-install.zip"
   )

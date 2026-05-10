@@ -1,6 +1,6 @@
-# Agent-Obsidian-install
+# qulv-agent-obsidian-install
 
-GitHub 仓库名建议使用：`Agent-Obsidian-install`。
+GitHub 仓库名：`qulv-agent-obsidian-install`。
 
 这套部署包用于把客户电脑初始化成可交付的 Agent 工作环境：
 
@@ -18,14 +18,14 @@ GitHub 仓库名建议使用：`Agent-Obsidian-install`。
 #### macOS / Linux（终端 / Terminal）
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Daknniel-0881/Agent-Obsidian-install/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Daknniel-0881/qulv-agent-obsidian-install/main/install.sh | bash
 ```
 
 #### Windows（PowerShell，建议右键"以管理员身份运行"）
 
 ```powershell
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
-irm https://raw.githubusercontent.com/Daknniel-0881/Agent-Obsidian-install/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/Daknniel-0881/qulv-agent-obsidian-install/main/install.ps1 | iex
 ```
 
 入口脚本会自动按以下顺序定位完整安装包：
@@ -246,3 +246,11 @@ obsidian help
 ```
 
 最后在 CodePilot 中打开工作目录，确认 Claude Code 启动后能读到 `CLAUDE.md`，并能按要求把内容保存到 Obsidian vault。
+
+## 关于本仓库与曲率企业 AI 服务
+
+本仓库开源分享 **qulv-agent-obsidian-install**：跨平台一键部署 Agent、Obsidian 与自动化环境的安装包，让团队能更快搭起可复用的 AI 工作台。曲率提供企业 AI 培训、企业 AI 转型咨询、落地工具搭建、AI 工具定制及 Skill 定制、企业 AI 转型全程陪跑，帮助团队把 AI 从演示样例落到真实业务流程中。
+
+感兴趣可扫码添加微信：
+
+![曲率企业 AI 服务海报](assets/qulv/qulv-ai-business-poster-readme.png)

@@ -22,7 +22,7 @@
   ★ Mac / Linux ★
   打开"终端"（Mac: 启动台搜索"Terminal"），粘贴下面这行：
 
-    curl -fsSL https://raw.githubusercontent.com/Daknniel-0881/Agent-Obsidian-install/main/install.sh | bash
+    curl -fsSL https://raw.githubusercontent.com/Daknniel-0881/qulv-agent-obsidian-install/main/install.sh | bash
 
   ★ Windows ★
   右键"开始"→ 选"终端（管理员）" 或 "PowerShell（管理员）"，
@@ -32,7 +32,7 @@
 
   再粘贴下面这行：
 
-    irm https://raw.githubusercontent.com/Daknniel-0881/Agent-Obsidian-install/main/install.ps1 | iex
+    irm https://raw.githubusercontent.com/Daknniel-0881/qulv-agent-obsidian-install/main/install.ps1 | iex
 
   自动行为（无需你介入）：
     1. 检测你的系统（Mac / Linux / Windows + ARM / Intel）
