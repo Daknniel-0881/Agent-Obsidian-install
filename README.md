@@ -1,74 +1,69 @@
 # qulv-agent-obsidian-install
 
-曲率 AI · Agent + Obsidian + 自动化环境安装器。
+本仓库用于分发「曲率 AI · Agent + Obsidian + 自动化环境」客户安装包。
 
-当前仓库只发布 **Mac 版本**。Windows 和 Linux 版本还在测试中，测试跑通后再继续追加到这个仓库。
+当前只发布 **Mac 版本**。Windows 和 Linux 版本还在本地测试，测试完成后再继续发布。
 
-## 当前可用版本
+## Mac 一条命令安装
 
-| 系统 | 状态 | 说明 |
-|---|---|---|
-| macOS | 可用 | 当前已发布，可用一行命令安装 |
-| Windows | 测试中 | 暂未发布 |
-| Linux | 测试中 | 暂未发布 |
-
-## 一行安装命令
-
-在 Mac 的“终端”里复制粘贴下面这一行，回车运行：
+在 Mac 自带「终端」里复制粘贴下面整段命令，然后回车：
 
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Daknniel-0881/qulv-agent-obsidian-install/main/install.sh)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Daknniel-0881/qulv-agent-obsidian-install/main/install-mac-from-github.sh)"
 ```
 
-安装过程会显示在终端窗口里。遇到 `Password:` 时，输入这台 Mac 的开机密码，输入时屏幕不会显示字符，输完回车即可。
+这条命令会自动下载仓库里的 `Mac系统` 说明和脚本，再从 GitHub Release 下载 `Agent-Obsidian-install-Mac.zip`，放到 `~/Downloads/Mac系统`，然后打开新的终端窗口开始安装。
 
-## 安装内容
+如果 `curl` 访问 GitHub 很慢，也可以先下载本仓库 ZIP，手动解压后把 `Mac系统` 文件夹放到 `~/Downloads/Mac系统`，再打开 `Mac系统/复制到终端运行.txt`，全选复制到终端运行。
 
-Mac 安装器会尽量自动准备：
+## Mac 包里有什么
 
-- Apple 命令行工具
-- Homebrew
+| 内容 | 说明 |
+|---|---|
+| GitHub Release: `Agent-Obsidian-install-Mac.zip` | 真正的安装包，由一键脚本自动下载 |
+| `Mac系统/复制到终端运行.txt` | 给客户复制粘贴到终端的一条安装命令 |
+| `Mac系统/使用说明.txt` | 极简操作说明 |
+| `Mac系统/install-macos-*.sh` | 当前版本安装脚本快照 |
+
+说明：安装包 zip 体积超过 GitHub 普通仓库单文件限制，因此 zip 放在 GitHub Release 资产中；仓库里保留说明、脚本和一键拉取入口。
+
+## 会自动安装什么
+
+- Apple Command Line Tools
+- Homebrew（官方源和国内镜像测速择优）
 - Git
 - Node.js / npm
 - Python 3.13
 - Claude Code CLI
 - Lark CLI
+- HyperFrames CLI
+- 企业微信 CLI
+- MarkItDown
+- yt-dlp
+- FFmpeg
 - CodePilot
 - Obsidian
-- Obsidian CLI 配置提示
-- 基础 Skills
-- `~/Desktop/CodePilot/Bridge`
-- `~/Desktop/CodePilot/Obsidian`
+- Obsidian CLI 软链
+- 通用 Skills：Obsidian、Lark、文档处理、PPT/PDF/表格、Skill 创建、工具发现、前端设计、HyperFrames、Agent Reach 等
 
-## 这条命令会做什么
+`wechat-cli` 已从默认安装清单移除。
 
-1. 下载最新版 `Agent-Obsidian-install-Mac.zip`。
-2. 保存到 `~/Downloads/Mac系统/`。
-3. 校验安装包 SHA256。
-4. 解压安装包。
-5. 运行 `install/install-macos.sh`。
-6. 生成安装日志和交付清单。
+## 不会替客户做什么
 
-## 安装包位置
+- 不预置 API Key、token、cookie、OAuth 登录态
+- 不代替客户登录飞书、企业微信、Obsidian 或 CodePilot
+- 不自动读取微信聊天记录
+- 不自动启动 WeRSS、CodexBridge 等账号态工具
+- 不把本机个人路径、私有知识库、客户资料打包进客户包
 
-完整 Mac 安装包放在 GitHub Release，不直接放在仓库文件里：
+## 安装日志
 
-```text
-https://github.com/Daknniel-0881/qulv-agent-obsidian-install/releases/latest
-```
+安装时会弹出终端窗口显示进度。
 
-原因是 Mac 安装包包含 `.dmg` 离线安装文件，体积超过 GitHub 普通仓库单文件限制。
-
-## 当前版本
-
-- Mac 安装脚本：`2026-05-12.8`
-- 安装包：`Agent-Obsidian-install-Mac.zip`
-- SHA256：`2f7f6e7b831d46a75a01776c565a44482fb98225f3b94651c302e29091680724`
-
-## 日志位置
-
-安装日志会保存在：
+日志保存在：
 
 ```text
-~/Downloads/Agent-Obsidian-install-logs
+~/Downloads/Agent-Obsidian-install-logs/
 ```
+
+如果安装失败，把最新的 `install-macos-*.log` 和 `delivery-checklist-*.txt` 回传给交付人员即可定位。

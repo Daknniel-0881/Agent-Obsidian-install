@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
+SCRIPT_VERSION="2026-05-13.1"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 APP_DIR="$ROOT_DIR/apps"
 TEMPLATE_DIR="$ROOT_DIR/templates"
 SKILL_DIR="$ROOT_DIR/payload/skills"
+TOOL_DIR="$ROOT_DIR/payload/tools"
 LOG_DIR="$HOME/Downloads/Agent-Obsidian-install-logs"
 LOG_FILE="$LOG_DIR/install-macos-$(date '+%Y%m%d-%H%M%S').log"
 REPORT_FILE="$LOG_DIR/delivery-checklist-$(date '+%Y%m%d-%H%M%S').txt"
@@ -123,6 +125,9 @@ prepend_path_once() {
 
 refresh_shell_paths() {
   prepend_path_once "$HOME/.local/bin"
+  prepend_path_once "$HOME/Library/Python/3.13/bin"
+  prepend_path_once "$HOME/Library/Python/3.12/bin"
+  prepend_path_once "$HOME/Library/Python/3.11/bin"
   prepend_path_once "/usr/local/bin"
   prepend_path_once "/opt/homebrew/bin"
   prepend_path_once "/Library/Frameworks/Python.framework/Versions/3.13/bin"
@@ -152,7 +157,7 @@ persist_agent_paths() {
     {
       echo ""
       echo "# BEGIN AGENT OBSIDIAN PATHS"
-      echo 'export PATH="$HOME/.local/bin:/usr/local/bin:/opt/homebrew/bin:/Library/Frameworks/Python.framework/Versions/3.13/bin:$PATH"'
+      echo 'export PATH="$HOME/.local/bin:$HOME/Library/Python/3.13/bin:$HOME/Library/Python/3.12/bin:$HOME/Library/Python/3.11/bin:/usr/local/bin:/opt/homebrew/bin:/Library/Frameworks/Python.framework/Versions/3.13/bin:$PATH"'
       echo "# END AGENT OBSIDIAN PATHS"
     } >> "$profile"
   done
@@ -231,8 +236,13 @@ print_component_status() {
   component_line "npm" "command -v npm" "npm --version" || true
   component_line "Python 3.13" "command -v python3.13" "python3.13 --version" || true
   component_line "Python 3" "command -v python3" "python3 --version" || true
+  component_line "MarkItDown" "command -v markitdown" "markitdown --version" || true
+  component_line "yt-dlp" "command -v yt-dlp" "yt-dlp --version" || true
+  component_line "FFmpeg" "command -v ffmpeg" "ffmpeg -version" || true
   component_line "Claude Code CLI" "command -v claude" "claude --version" || true
   component_line "Lark CLI" "command -v lark-cli" "lark-cli --version" || true
+  component_line "HyperFrames CLI" "command -v hyperframes" "hyperframes --version" || true
+  component_line "企业微信 CLI" "command -v wecom-cli" "wecom-cli --version" || true
   component_line "CodePilot.app" "test -d /Applications/CodePilot.app" "echo /Applications/CodePilot.app" || true
   component_line "Obsidian.app" "test -d /Applications/Obsidian.app" "echo /Applications/Obsidian.app" || true
   component_line "Obsidian CLI" "command -v obsidian" "obsidian version" || true
@@ -832,6 +842,132 @@ install_python313_direct() {
   return 1
 }
 
+python_for_pip() {
+  refresh_shell_paths
+  if command -v python3.13 >/dev/null 2>&1; then
+    command -v python3.13
+  elif command -v python3 >/dev/null 2>&1; then
+    command -v python3
+  else
+    return 1
+  fi
+}
+
+choose_pip_index() {
+  local label="$1"
+  local probe_package="$2"
+  local official_url="https://pypi.org/simple/${probe_package}/"
+  local tuna_url="https://pypi.tuna.tsinghua.edu.cn/simple/${probe_package}/"
+  local aliyun_url="https://mirrors.aliyun.com/pypi/simple/${probe_package}/"
+  local huawei_url="https://repo.huaweicloud.com/repository/pypi/simple/${probe_package}/"
+  local official_ms tuna_ms aliyun_ms huawei_ms fastest fastest_ms fallback
+
+  log "测速 $label Python 包下载路径"
+  official_ms="$(measure_url_ms "$official_url")"
+  tuna_ms="$(measure_url_ms "$tuna_url")"
+  aliyun_ms="$(measure_url_ms "$aliyun_url")"
+  huawei_ms="$(measure_url_ms "$huawei_url")"
+
+  fastest="pypi官方源"
+  fastest_ms="$official_ms"
+  AGENT_PIP_INDEX_URL="https://pypi.org/simple"
+  fallback="清华 PyPI 镜像"
+  AGENT_PIP_FALLBACK_INDEX_URL="https://pypi.tuna.tsinghua.edu.cn/simple"
+
+  if [ "$tuna_ms" -lt "$fastest_ms" ]; then
+    fastest="清华 PyPI 镜像"
+    fastest_ms="$tuna_ms"
+    AGENT_PIP_INDEX_URL="https://pypi.tuna.tsinghua.edu.cn/simple"
+    fallback="pypi官方源"
+    AGENT_PIP_FALLBACK_INDEX_URL="https://pypi.org/simple"
+  fi
+  if [ "$aliyun_ms" -lt "$fastest_ms" ]; then
+    fastest="阿里云 PyPI 镜像"
+    fastest_ms="$aliyun_ms"
+    AGENT_PIP_INDEX_URL="https://mirrors.aliyun.com/pypi/simple"
+    fallback="pypi官方源"
+    AGENT_PIP_FALLBACK_INDEX_URL="https://pypi.org/simple"
+  fi
+  if [ "$huawei_ms" -lt "$fastest_ms" ]; then
+    fastest="华为云 PyPI 镜像"
+    fastest_ms="$huawei_ms"
+    AGENT_PIP_INDEX_URL="https://repo.huaweicloud.com/repository/pypi/simple"
+    fallback="pypi官方源"
+    AGENT_PIP_FALLBACK_INDEX_URL="https://pypi.org/simple"
+  fi
+
+  echo "$label PyPI 官方源测速: ${official_ms}ms"
+  echo "$label 清华 PyPI 镜像测速: ${tuna_ms}ms"
+  echo "$label 阿里云 PyPI 镜像测速: ${aliyun_ms}ms"
+  echo "$label 华为云 PyPI 镜像测速: ${huawei_ms}ms"
+  record_selected_source "$label" "$fastest" "测速最快: ${fastest_ms}ms；备用: $fallback"
+}
+
+ensure_python_pip() {
+  local py="$1"
+
+  if "$py" -m pip --version >/dev/null 2>&1; then
+    return 0
+  fi
+
+  "$py" -m ensurepip --upgrade >/dev/null 2>&1 || true
+  "$py" -m pip --version >/dev/null 2>&1
+}
+
+pip_install_user() {
+  local package_spec="$1"
+  local probe_package="$2"
+  local label="$3"
+  local check_cmd="$4"
+  local manual_url="$5"
+  local py
+
+  refresh_shell_paths
+  if eval "$check_cmd" >/dev/null 2>&1; then
+    echo "$label 已安装，跳过。"
+    return 0
+  fi
+
+  py="$(python_for_pip || true)"
+  if [ -z "${py:-}" ]; then
+    add_manual_action "$label" "$manual_url" "未检测到可用 Python，无法自动安装 $label"
+    return 0
+  fi
+
+  if ! ensure_python_pip "$py"; then
+    add_manual_action "$label" "$manual_url" "Python pip 不可用，无法自动安装 $label"
+    return 0
+  fi
+
+  choose_pip_index "$label" "$probe_package"
+  if run_with_retries "$label" 3 "$py" -m pip install --user --upgrade "$package_spec" -i "$AGENT_PIP_INDEX_URL"; then
+    refresh_shell_paths
+    if eval "$check_cmd" >/dev/null 2>&1; then
+      echo "$label 安装完成。"
+      return 0
+    fi
+  fi
+
+  record_selected_source "$label 备用" "$AGENT_PIP_FALLBACK_INDEX_URL" "主路径失败或命令不可用后切换备用 PyPI 源"
+  if run_with_retries "$label 备用路径" 2 "$py" -m pip install --user --upgrade "$package_spec" -i "$AGENT_PIP_FALLBACK_INDEX_URL"; then
+    refresh_shell_paths
+    if eval "$check_cmd" >/dev/null 2>&1; then
+      echo "$label 安装完成。"
+      return 0
+    fi
+  fi
+
+  add_manual_action "$label" "$manual_url" "$label 自动安装失败，请人工安装"
+  return 0
+}
+
+install_python_cli_tools() {
+  log "检查并安装 Python CLI 工具"
+  pip_install_user "markitdown[all]" "markitdown" "MarkItDown" "command -v markitdown" "https://github.com/microsoft/markitdown" || true
+  pip_install_user "yt-dlp" "yt-dlp" "yt-dlp" "command -v yt-dlp" "https://github.com/yt-dlp/yt-dlp" || true
+  pip_install_user "reportlab" "reportlab" "any2pdf 依赖 reportlab" "python_for_pip >/dev/null 2>&1 && \"$(python_for_pip)\" -c 'import reportlab'" "https://pypi.org/project/reportlab/" || true
+}
+
 find_cli_candidate() {
   local binary_name="$1"
   local npm_prefix npm_root
@@ -995,6 +1131,26 @@ ensure_homebrew_and_node() {
   python3.13 --version || python3 --version || true
 }
 
+ensure_ffmpeg() {
+  local brew_bin
+
+  refresh_shell_paths
+  if command -v ffmpeg >/dev/null 2>&1; then
+    echo "FFmpeg 已安装，跳过。"
+    ffmpeg -version | head -n 1 || true
+    return 0
+  fi
+
+  log "检查并安装 FFmpeg"
+  brew_bin="$(find_brew || true)"
+  if [ -n "${brew_bin:-}" ]; then
+    eval "$("$brew_bin" shellenv)"
+    brew_install_formula "FFmpeg" "ffmpeg" "command -v ffmpeg" "https://ffmpeg.org/download.html" || true
+  else
+    add_manual_action "FFmpeg" "https://ffmpeg.org/download.html" "未检测到 Homebrew，请人工安装 FFmpeg"
+  fi
+}
+
 npm_package_probe_path() {
   local package_name="$1"
 
@@ -1143,18 +1299,20 @@ install_obsidian_cli() {
 }
 
 write_claude_memory() {
-  log "创建工作目录、Obsidian 知识库目录和 CLAUDE.md"
+  log "创建工作目录、Obsidian 知识库目录和全局 CLAUDE.md"
   mkdir -p "$BRIDGE_DIR" "$VAULT_DIR" "$HOME/.claude/skills"
+  local rendered_tmp
+  rendered_tmp="$(mktemp)"
 
   if [ -f "$TEMPLATE_DIR/CLAUDE.md" ]; then
     sed \
       -e "s|__VAULT_PATH__|$VAULT_DIR|g" \
       -e "s|__BRIDGE_PATH__|$BRIDGE_DIR|g" \
-      "$TEMPLATE_DIR/CLAUDE.md" > "$BRIDGE_DIR/CLAUDE.md"
-    echo "Bridge CLAUDE.md 已刷新。"
+      "$TEMPLATE_DIR/CLAUDE.md" > "$rendered_tmp"
   else
     echo "缺少模板: $TEMPLATE_DIR/CLAUDE.md"
     add_manual_action "CLAUDE.md" "$TEMPLATE_DIR/CLAUDE.md" "缺少模板文件，已跳过自动写入"
+    rm -f "$rendered_tmp"
     return 0
   fi
 
@@ -1175,14 +1333,14 @@ write_claude_memory() {
   fi
 
   {
-    cat "$global_tmp"
-    echo ""
-    echo "<!-- BEGIN CODEPILOT KB DEFAULTS -->"
-    cat "$BRIDGE_DIR/CLAUDE.md"
-    echo "<!-- END CODEPILOT KB DEFAULTS -->"
-  } > "$global_claude"
-  rm -f "$global_tmp"
-  echo "全局 CLAUDE.md 默认知识库路径已刷新。"
+	    cat "$global_tmp"
+	    echo ""
+	    echo "<!-- BEGIN CODEPILOT KB DEFAULTS -->"
+	    cat "$rendered_tmp"
+	    echo "<!-- END CODEPILOT KB DEFAULTS -->"
+	  } > "$global_claude"
+	  rm -f "$global_tmp" "$rendered_tmp"
+	  echo "全局 CLAUDE.md 默认知识库路径已刷新。"
 }
 
 install_skills() {
@@ -1204,6 +1362,32 @@ install_skills() {
   else
     add_manual_action "基础 Skills" "$SKILL_DIR" "安装包中缺少 Skills 目录"
   fi
+}
+
+install_tool_sources() {
+  local tool target_root target
+
+  log "安装工具源码和工具说明"
+  if [ ! -d "$TOOL_DIR" ]; then
+    echo "安装包中没有额外工具源码目录，跳过。"
+    return 0
+  fi
+
+  target_root="$BRIDGE_DIR/tools"
+  mkdir -p "$target_root"
+  for tool in "$TOOL_DIR"/*; do
+    [ -e "$tool" ] || continue
+    target="$target_root/$(basename "$tool")"
+    if [ -e "$target" ]; then
+      echo "工具已存在，跳过: $(basename "$tool")"
+      continue
+    fi
+    if cp -R "$tool" "$target"; then
+      echo "已安装工具: $(basename "$tool")"
+    else
+      add_manual_action "工具: $(basename "$tool")" "$tool" "工具复制失败，请人工复制"
+    fi
+  done
 }
 
 configure_power() {
@@ -1258,7 +1442,7 @@ main() {
   echo "  曲率 AI · Agent-Obsidian-install"
   echo "  正在安装 Agent + Obsidian + 自动化环境"
   echo "============================================================"
-  echo "脚本版本: 2026-05-12.8"
+  echo "脚本版本: $SCRIPT_VERSION"
   echo "安装日志: $LOG_FILE"
 
   print_component_status "安装前检测" || true
@@ -1268,12 +1452,17 @@ main() {
   ensure_homebrew_and_node
   npm_install_global "@anthropic-ai/claude-code" "Claude Code" "claude"
   npm_install_global "@larksuite/cli" "Lark CLI" "lark-cli"
+  npm_install_global "hyperframes" "HyperFrames CLI" "hyperframes"
+  npm_install_global "@wecom/cli" "企业微信 CLI" "wecom-cli"
+  install_python_cli_tools
+  ensure_ffmpeg
   codepilot_dmg="$(select_codepilot_dmg || true)"
   install_dmg_app "$codepilot_dmg" "CodePilot"
   install_dmg_app "$APP_DIR/Obsidian-1.12.7.dmg" "Obsidian"
   install_obsidian_cli
   write_claude_memory
   install_skills
+  install_tool_sources
   configure_power
   open -a CodePilot || true
   open -a Obsidian || true

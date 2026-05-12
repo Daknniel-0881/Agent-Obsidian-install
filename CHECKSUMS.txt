@@ -1,3 +1,6 @@
-2f7f6e7b831d46a75a01776c565a44482fb98225f3b94651c302e29091680724  Agent-Obsidian-install-Mac.zip
-a0a46d426f19d729a56ab1d27aee31d13b65d0e98ff1a10312ded0d65d168c97  install-macos-20260512.8.sh
+# Checksums
 
+324421d8b7e90d58a01271f61d533273a17f8bfbe93fbefa59e45bc2f47ff433  Agent-Obsidian-install-Mac.zip
+d04e2d4c8c268b19cf25976ac5aa10ea0dad2b8f46d487158fbd166d34fda914  Mac系统/install/install-macos.sh
+d04e2d4c8c268b19cf25976ac5aa10ea0dad2b8f46d487158fbd166d34fda914  Mac系统/install-macos-20260513.1.sh
+faa78c066a7e95782b81b9c7c504ac1e4bd91cd7e15ca7b22a5b6c4c79d74ab8  install-mac-from-github.sh
