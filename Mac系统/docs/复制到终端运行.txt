@@ -1,0 +1,102 @@
+/bin/bash <<'BASH'
+set -Eeuo pipefail
+
+MAC_DIR="$HOME/Downloads/Mac系统"
+RUNNER="$MAC_DIR/.run-agent-obsidian-install.command"
+
+if [ ! -d "$MAC_DIR" ]; then
+  echo "没有找到：$MAC_DIR"
+  echo "请先把 Mac系统 文件夹放到 下载(Downloads) 目录。"
+  exit 1
+fi
+
+cat > "$RUNNER" <<'RUNNER_BASH'
+#!/bin/bash
+set -Eeuo pipefail
+
+MAC_DIR="$HOME/Downloads/Mac系统"
+ZIP="$MAC_DIR/Agent-Obsidian-install-Mac.zip"
+LOG_DIR="$HOME/Downloads/Agent-Obsidian-install-logs"
+
+find_installer_script() {
+  find "$MAC_DIR" -maxdepth 5 -type f -path "*/install/install-macos.sh" -print | head -n 1
+}
+
+echo ""
+echo "============================================================"
+echo "  曲率 AI · Mac 安装任务"
+echo "============================================================"
+echo ""
+echo "请保持这个终端窗口打开。安装进度会显示在这里。"
+echo "安装日志会保存在：$LOG_DIR"
+echo ""
+echo "如果看到 Password: 提示，请输入这台 Mac 的开机登录密码。"
+echo "输入时屏幕不会显示字符，输完按回车即可。"
+echo ""
+
+mkdir -p "$LOG_DIR"
+
+if [ ! -d "$MAC_DIR" ]; then
+  echo "没有找到：$MAC_DIR"
+  echo "请先把 Mac系统 文件夹放到 下载(Downloads) 目录。"
+  read -n 1 -s -r -p "按任意键关闭这个终端窗口..."
+  echo ""
+  exit 1
+fi
+
+cd "$MAC_DIR"
+xattr -dr com.apple.quarantine . 2>/dev/null || true
+
+if [ -f "$ZIP" ]; then
+  echo "正在解压安装包..."
+  ditto -x -k "$ZIP" "$MAC_DIR"
+  xattr -dr com.apple.quarantine . 2>/dev/null || true
+fi
+
+SCRIPT="$(find_installer_script || true)"
+
+if [ -z "${SCRIPT:-}" ]; then
+  echo "没有找到 install/install-macos.sh"
+  echo "请确认压缩包存在且没有损坏：$ZIP"
+  open "$LOG_DIR" 2>/dev/null || true
+  read -n 1 -s -r -p "按任意键关闭这个终端窗口..."
+  echo ""
+  exit 1
+fi
+
+chmod +x "$SCRIPT" 2>/dev/null || true
+
+echo "找到安装脚本：$SCRIPT"
+echo "开始运行 Mac 安装脚本..."
+echo ""
+
+set +e
+bash "$SCRIPT" </dev/tty
+INSTALL_EXIT=$?
+set -e
+
+echo ""
+if [ "$INSTALL_EXIT" -eq 0 ]; then
+  echo "安装脚本已运行完成。"
+else
+  echo "安装脚本已停止，退出码：$INSTALL_EXIT"
+  echo "如果上面提示安装 Apple 命令行工具，正常情况下终端会等待并自动继续。"
+  echo "如果你取消了安装窗口，或终端已经停止，请重新运行 复制到终端运行.txt 里的完整命令。"
+fi
+
+echo ""
+echo "日志目录：$LOG_DIR"
+open "$LOG_DIR" 2>/dev/null || true
+echo ""
+read -n 1 -s -r -p "按任意键关闭这个终端窗口..."
+echo ""
+exit "$INSTALL_EXIT"
+RUNNER_BASH
+
+chmod +x "$RUNNER"
+xattr -dr com.apple.quarantine "$RUNNER" 2>/dev/null || true
+
+echo "正在打开新的终端窗口运行安装..."
+open -a Terminal "$RUNNER"
+echo "如果没有弹出新的终端窗口，请重新粘贴本 TXT 内容，或联系交付人员。"
+BASH
