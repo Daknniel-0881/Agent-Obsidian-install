@@ -1,36 +1,86 @@
 # qulv-agent-obsidian-install
 
-本仓库用于分发「曲率 AI · Agent + Obsidian + 自动化环境」客户安装包。
+「曲率 AI · Agent + Obsidian + 自动化环境」客户一键安装包。
 
-当前只发布 **Mac 版本**。Windows 和 Linux 版本还在本地测试，测试完成后再继续发布。
+当前 release 已发布：
 
-## Mac 一条命令安装
+- macOS：把安装包放到 `~/Downloads/Mac系统`，自动打开终端执行安装。
+- Windows：把安装包放到 `Downloads\Windows系统`，自动解压并运行 `启动.bat`。
 
-在 Mac 自带「终端」里复制粘贴下面整段命令，然后回车：
+Linux 版本暂未发布到本仓库，后续测试稳定后再加入。
+
+## 一条命令安装
+
+macOS 用户打开系统自带「终端」，复制下面一整行并回车：
 
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Daknniel-0881/qulv-agent-obsidian-install/main/install-mac-from-github.sh)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Daknniel-0881/qulv-agent-obsidian-install/main/install.sh)"
 ```
 
-这条命令会自动下载仓库里的 `Mac系统` 说明和脚本，再从 GitHub Release 下载 `Agent-Obsidian-install-Mac.zip`，放到 `~/Downloads/Mac系统`，然后打开新的终端窗口开始安装。
+Windows 用户打开 PowerShell，复制下面一整行并回车：
 
-如果 `curl` 访问 GitHub 很慢，也可以先下载本仓库 ZIP，手动解压后把 `Mac系统` 文件夹放到 `~/Downloads/Mac系统`，再打开 `Mac系统/复制到终端运行.txt`，全选复制到终端运行。
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -Command "iwr -UseBasicParsing https://raw.githubusercontent.com/Daknniel-0881/qulv-agent-obsidian-install/main/install.ps1 | iex"
+```
 
-## Mac 包里有什么
+这两个入口都会识别当前系统并下载对应 release 资产。macOS 入口会下载 `Agent-Obsidian-install-Mac.zip`，Windows 入口会下载 `Agent-Obsidian-install-Windows-final-20260521.18.zip`。
 
-| 内容 | 说明 |
-|---|---|
-| GitHub Release: `Agent-Obsidian-install-Mac.zip` | 真正的安装包，由一键脚本自动下载 |
-| `Mac系统/复制到终端运行.txt` | 给客户复制粘贴到终端的一条安装命令 |
-| `Mac系统/使用说明.txt` | 极简操作说明 |
-| `Mac系统/install-macos-*.sh` | 当前版本安装脚本快照 |
+## 国内网络备用命令
 
-说明：安装包 zip 体积超过 GitHub 普通仓库单文件限制，因此 zip 放在 GitHub Release 资产中；仓库里保留说明、脚本和一键拉取入口。
+如果 `raw.githubusercontent.com` 在国内网络下访问很慢，可以先用下面的镜像备用入口。镜像只用于拉取入口脚本和安装包，安装包下载后会做 SHA256 校验，校验失败会停止安装。
 
-## 会自动安装什么
+macOS：
 
-- Apple Command Line Tools
-- Homebrew（官方源和国内镜像测速择优）
+```bash
+/bin/bash -c "$(curl -fsSL https://gh.llkk.cc/https://raw.githubusercontent.com/Daknniel-0881/qulv-agent-obsidian-install/main/install.sh)"
+```
+
+Windows PowerShell：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -Command "iwr -UseBasicParsing https://gh.llkk.cc/https://raw.githubusercontent.com/Daknniel-0881/qulv-agent-obsidian-install/main/install.ps1 | iex"
+```
+
+脚本内部下载大文件时会按这个顺序尝试：
+
+1. GitHub 官方 release 地址
+2. `QULV_GITHUB_MIRROR_PREFIX` 指定的自定义镜像
+3. `QULV_GITHUB_MIRRORS` 指定的多个自定义镜像
+4. 内置备用镜像：`gh.llkk.cc`、`gh-proxy.com`、`mirror.ghproxy.com`
+
+如果你有自己的稳定镜像，可以这样临时指定：
+
+```bash
+QULV_GITHUB_MIRROR_PREFIX="https://你的镜像域名/" /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Daknniel-0881/qulv-agent-obsidian-install/main/install.sh)"
+```
+
+## 手动下载
+
+如果一条命令不可用，可以打开本仓库右侧 Releases，下载最新版本里的资源包：
+
+- `Agent-Obsidian-install-Mac.zip`
+- `Agent-Obsidian-install-Windows-final-20260521.18.zip`
+- `CHECKSUMS.txt`
+
+macOS 手动方式：
+
+1. 下载本仓库 ZIP，解压后把 `Mac系统` 文件夹放到 `~/Downloads/Mac系统`
+2. 把 `Agent-Obsidian-install-Mac.zip` 放到同一个 `Mac系统` 文件夹
+3. 打开 `Mac系统/复制到终端运行.txt`
+4. Command + A 全选，Command + C 复制
+5. 打开「终端」，Command + V 粘贴，回车运行
+
+Windows 手动方式：
+
+1. 解压 `Agent-Obsidian-install-Windows-final-20260521.18.zip`
+2. 双击 `启动.bat`
+3. 保持窗口打开，按提示完成安装
+
+## 包里会安装什么
+
+安装包会尽量先检测，已安装则跳过，未安装才继续安装。不同系统实现略有差异，但当前主要覆盖：
+
+- Apple Command Line Tools / Windows 基础运行环境
 - Git
 - Node.js / npm
 - Python 3.13
@@ -43,27 +93,27 @@
 - FFmpeg
 - CodePilot
 - Obsidian
-- Obsidian CLI 软链
-- 通用 Skills：Obsidian、Lark、文档处理、PPT/PDF/表格、Skill 创建、工具发现、前端设计、HyperFrames、Agent Reach 等
+- Obsidian CLI 注册提示和路径配置
+- 随包 Skills 与工具目录
 
-`wechat-cli` 已从默认安装清单移除。
+`wechat-cli` 不在默认安装清单里。
 
-## 不会替客户做什么
+## 隐私和账号边界
 
-- 不预置 API Key、token、cookie、OAuth 登录态
-- 不代替客户登录飞书、企业微信、Obsidian 或 CodePilot
-- 不自动读取微信聊天记录
-- 不自动启动 WeRSS、CodexBridge 等账号态工具
-- 不把本机个人路径、私有知识库、客户资料打包进客户包
+安装包不会预置或上传客户的 API Key、token、cookie、OAuth 登录态，也不会自动读取微信聊天记录。飞书、企业微信、CodePilot、Obsidian 等账号授权，需要客户在本机自行完成。
 
-## 安装日志
+## 日志位置
 
-安装时会弹出终端窗口显示进度。
-
-日志保存在：
+macOS 日志：
 
 ```text
 ~/Downloads/Agent-Obsidian-install-logs/
 ```
 
-如果安装失败，把最新的 `install-macos-*.log` 和 `delivery-checklist-*.txt` 回传给交付人员即可定位。
+Windows 日志：
+
+```text
+%USERPROFILE%\Downloads\Agent-Obsidian-install-logs
+```
+
+如果安装失败，把最新日志文件和交付清单回传给交付人员即可定位。

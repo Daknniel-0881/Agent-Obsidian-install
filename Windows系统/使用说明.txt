@@ -1,0 +1,56 @@
+﻿曲率 AI · Windows 安装说明
+==========================
+
+请把本文件夹完整放在同一个目录里，不要只单独复制某一个文件。
+
+本文件夹应包含：
+1. 启动.bat
+2. Agent-Obsidian-install-Windows.zip
+3. 可以直接复制粘贴到终端运行的指令.txt
+4. 使用说明.txt
+
+推荐安装方式：
+双击“启动.bat”，保持弹出的黑色窗口不要关闭，等待安装流程结束。
+
+磁盘空间说明：
+新版安装器会自动检测本机所有可写的固定磁盘分区，排除可识别的 U 盘/USB 存储后，按可用空间从大到小排序，并把 CodePilot 工作目录、Obsidian 知识库和安装器托管工具目录放到可用空间最大的分区中。客户电脑只有 C 盘时才会回退到 C 盘。日志仍保存在 Downloads，方便回传。
+
+临时文件说明：
+启动器会把安装包临时解压到可用空间最大的固定磁盘，例如 D:\Agent-Obsidian-Temp 或 E:\Agent-Obsidian-Temp。安装结束后会自动清理本次临时解压目录和脚本下载/解压缓存；如果目录被安全软件或刚启动的程序短暂占用，窗口会提示稍后手动删除的路径。
+
+如果 Windows、联想电脑管家或安全软件弹出“是否允许此应用进行更改”“推荐从应用商店下载”“安装权限”等提示，请选择“是 / 允许 / 继续安装”。脚本会优先使用当前用户目录安装；少数系统级工具或本地安装包可能需要人工确认。
+
+如果长时间没有下一步，请查看窗口最后一行和日志目录。新版脚本会给安装器设置超时；如果被弹窗拦截，不会假装成功，会在交付清单里列出失败组件和下一步。
+
+如果双击无法运行：
+1. 打开“Windows PowerShell”
+2. 打开“可以直接复制粘贴到终端运行的指令.txt”
+3. Ctrl+A 全选，Ctrl+C 复制
+4. 粘贴到 PowerShell，按回车运行。指令会自动在 Downloads 里寻找完整安装包文件夹。
+
+脚本会自动检查或安装：
+Git、Node.js/npm、Python 3.13、Claude Code CLI、Lark CLI、HyperFrames CLI、企业微信 CLI、MarkItDown、yt-dlp、FFmpeg、CodePilot、Obsidian、基础 Skills。
+
+wechat-cli 已从安装清单移除，不会自动安装。
+
+安装日志会保存在：
+%USERPROFILE%\Downloads\Agent-Obsidian-install-logs
+
+安装结束前，窗口会用绿色高亮显示最终交付清单、安装后全面检测清单和安装日志路径。
+
+如果安装失败，请把这个目录里最新的三个文件发给交付人员：
+1. install-windows-开头的日志文件
+2. delivery-checklist-开头的交付清单
+3. post-install-detection-开头的安装后全面检测清单
+
+安装完成后：
+1. 打开 CodePilot
+2. 在 CodePilot 左下角设置里配置服务商，API Key 由客户自己填写
+3. 打开 Obsidian，选择知识库目录：
+   以安装窗口和交付清单显示的路径为准，通常类似：
+   D:\CodePilot\Obsidian
+   或
+   E:\CodePilot\Obsidian
+4. 如需飞书能力，请在 PowerShell 运行：
+   lark-cli config init --new
+5. 如需企业微信能力，请按企业微信 CLI 的提示自行初始化授权。

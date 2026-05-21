@@ -1,0 +1,30 @@
+﻿$candidates = @(
+  "$env:USERPROFILE\Downloads",
+  "$env:USERPROFILE\Downloads\Windows系统",
+  "$env:USERPROFILE\Downloads\Agent-Obsidian-install-Windows",
+  "$env:USERPROFILE\Downloads\Agent-Obsidian-install-Windows-final"
+)
+
+$folder = $candidates |
+  Where-Object {
+    (Test-Path -LiteralPath (Join-Path $_ "启动.bat")) -and
+    (Test-Path -LiteralPath (Join-Path $_ "Agent-Obsidian-install-Windows.zip"))
+  } |
+  Select-Object -First 1
+
+if (-not $folder) {
+  $folder = Get-ChildItem -LiteralPath "$env:USERPROFILE\Downloads" -Directory -ErrorAction SilentlyContinue |
+    Where-Object {
+      (Test-Path -LiteralPath (Join-Path $_.FullName "启动.bat")) -and
+      (Test-Path -LiteralPath (Join-Path $_.FullName "Agent-Obsidian-install-Windows.zip"))
+    } |
+    Sort-Object LastWriteTime -Descending |
+    Select-Object -First 1 -ExpandProperty FullName
+}
+
+if (-not $folder) {
+  throw "未在 Downloads 目录找到安装包文件夹。请先解压完整安装包，再重新运行这段命令。"
+}
+
+Set-Location -LiteralPath $folder
+cmd /d /c ".\启动.bat"
