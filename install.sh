@@ -3,9 +3,9 @@ set -Eeuo pipefail
 
 REPO="Daknniel-0881/qulv-agent-obsidian-install"
 BRANCH="${QULV_BRANCH:-main}"
-RELEASE_TAG="${QULV_RELEASE_TAG:-v2026.05.21.18}"
-MAC_ASSET="Agent-Obsidian-install-Mac.zip"
-MAC_SHA256="9644fd75fc6e4b6079c8a7366ae90df091fe00240261a579e9ff437a376212b7"
+RELEASE_TAG="${QULV_RELEASE_TAG:-v2026.05.21.19}"
+MAC_ASSET="Agent-Obsidian-install-Mac-final-20260521.19.zip"
+MAC_SHA256="a4696ee69402ed8881dbf50e0df673368c198083f832a4c6e2288f794247da89"
 MAC_DIR="$HOME/Downloads/Mac系统"
 
 DEFAULT_MIRRORS=(
@@ -86,7 +86,7 @@ verify_sha256() {
 }
 
 install_macos() {
-  local tmp_dir repo_zip src_mac_dir package_url
+  local tmp_dir package_url
 
   tmp_dir="$(mktemp -d "/tmp/qulv-agent-obsidian-install.XXXXXX")"
   trap 'rm -rf "$tmp_dir"' EXIT
@@ -101,34 +101,23 @@ install_macos() {
   echo "官方源优先；如果 GitHub 访问失败，会自动尝试备用镜像。"
   echo "安装包下载后会做 SHA256 校验，校验失败不会继续安装。"
 
-  log "下载仓库中的 Mac 说明和入口脚本"
-  download_with_fallback \
-    "仓库文件" \
-    "https://github.com/$REPO/archive/refs/heads/$BRANCH.zip" \
-    "$tmp_dir/repo.zip" \
-    600
-
-  ditto -x -k "$tmp_dir/repo.zip" "$tmp_dir/repo"
-  src_mac_dir="$(find "$tmp_dir/repo" -type d -name "Mac系统" -print | head -n 1)"
-  if [ -z "${src_mac_dir:-}" ] || [ ! -d "$src_mac_dir" ]; then
-    echo "没有在仓库里找到 Mac系统 文件夹。"
-    exit 1
-  fi
-
-  log "更新本机 Mac 安装目录"
-  rm -rf "$MAC_DIR"
-  mkdir -p "$(dirname "$MAC_DIR")"
-  ditto "$src_mac_dir" "$MAC_DIR"
-  xattr -dr com.apple.quarantine "$MAC_DIR" 2>/dev/null || true
-
-  log "下载 Mac 安装包"
+  log "下载完整 Mac 安装包"
   package_url="https://github.com/$REPO/releases/download/$RELEASE_TAG/$MAC_ASSET"
-  download_with_fallback "$MAC_ASSET" "$package_url" "$MAC_DIR/$MAC_ASSET" 2400
-  verify_sha256 "$MAC_DIR/$MAC_ASSET" "$MAC_SHA256"
+  download_with_fallback "$MAC_ASSET" "$package_url" "$tmp_dir/$MAC_ASSET" 2400
+  verify_sha256 "$tmp_dir/$MAC_ASSET" "$MAC_SHA256"
+
+  log "解压到本机下载目录"
+  rm -rf "$MAC_DIR"
+  ditto -x -k "$tmp_dir/$MAC_ASSET" "$HOME/Downloads"
   xattr -dr com.apple.quarantine "$MAC_DIR" 2>/dev/null || true
 
   if [ ! -f "$MAC_DIR/复制到终端运行.txt" ]; then
     echo "缺少：$MAC_DIR/复制到终端运行.txt"
+    exit 1
+  fi
+
+  if [ ! -f "$MAC_DIR/Agent-Obsidian-install-Mac.zip" ]; then
+    echo "缺少：$MAC_DIR/Agent-Obsidian-install-Mac.zip"
     exit 1
   fi
 

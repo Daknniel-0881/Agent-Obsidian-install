@@ -10,7 +10,7 @@ LOG_FILE="$LOG_DIR/install-macos-$(date '+%Y%m%d-%H%M%S').log"
 REPORT_FILE="$LOG_DIR/delivery-checklist-$(date '+%Y%m%d-%H%M%S').txt"
 WORK_ROOT="$HOME/Desktop/CodePilot"
 BRIDGE_DIR="$WORK_ROOT/Bridge"
-VAULT_DIR="$WORK_ROOT/Obsidian/ClaudeCode"
+VAULT_DIR="$WORK_ROOT/Obsidian"
 NODE_VERSION="24.15.0"
 PYTHON_313_VERSION="3.13.13"
 DOWNLOAD_FAILURES=0
@@ -1119,7 +1119,7 @@ main() {
   echo "  曲率 AI · Agent-Obsidian-install"
   echo "  正在安装 Agent + Obsidian + 自动化环境"
   echo "============================================================"
-  echo "脚本版本: 2026-05-12.6"
+  echo "脚本版本: 2026-05-21.19"
   echo "安装日志: $LOG_FILE"
 
   print_component_status "安装前检测" || true

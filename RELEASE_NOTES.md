@@ -1,9 +1,10 @@
 # Release Notes
 
-## v2026.05.21.18
+## v2026.05.21.19
 
-- 发布当前测试稳定的 macOS 安装包：`Agent-Obsidian-install-Mac.zip`。
+- 发布当前测试稳定的完整 macOS 文件夹安装包：`Agent-Obsidian-install-Mac-final-20260521.19.zip`。
 - 发布当前测试稳定的 Windows 安装包：`Agent-Obsidian-install-Windows-final-20260521.18.zip`。
+- 修复 macOS 默认 Obsidian 知识库路径：从 `~/Desktop/CodePilot/Obsidian/ClaudeCode` 改为 `~/Desktop/CodePilot/Obsidian`。
 - 新增仓库级一键入口：
   - `install.sh`：macOS/Linux shell 入口，当前 release 支持 macOS。
   - `install.ps1`：Windows PowerShell 入口。

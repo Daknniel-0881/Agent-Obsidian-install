@@ -23,7 +23,7 @@ Windows 用户打开 PowerShell，复制下面一整行并回车：
 powershell -NoProfile -ExecutionPolicy Bypass -Command "iwr -UseBasicParsing https://raw.githubusercontent.com/Daknniel-0881/qulv-agent-obsidian-install/main/install.ps1 | iex"
 ```
 
-这两个入口都会识别当前系统并下载对应 release 资产。macOS 入口会下载 `Agent-Obsidian-install-Mac.zip`，Windows 入口会下载 `Agent-Obsidian-install-Windows-final-20260521.18.zip`。
+这两个入口都会识别当前系统并下载对应 release 资产。macOS 入口会下载完整的 `Agent-Obsidian-install-Mac-final-20260521.19.zip`，Windows 入口会下载 `Agent-Obsidian-install-Windows-final-20260521.18.zip`。
 
 ## 国内网络备用命令
 
@@ -58,14 +58,14 @@ QULV_GITHUB_MIRROR_PREFIX="https://你的镜像域名/" /bin/bash -c "$(curl -fs
 
 如果一条命令不可用，可以打开本仓库右侧 Releases，下载最新版本里的资源包：
 
-- `Agent-Obsidian-install-Mac.zip`
+- `Agent-Obsidian-install-Mac-final-20260521.19.zip`
 - `Agent-Obsidian-install-Windows-final-20260521.18.zip`
 - `CHECKSUMS.txt`
 
 macOS 手动方式：
 
-1. 下载本仓库 ZIP，解压后把 `Mac系统` 文件夹放到 `~/Downloads/Mac系统`
-2. 把 `Agent-Obsidian-install-Mac.zip` 放到同一个 `Mac系统` 文件夹
+1. 解压 `Agent-Obsidian-install-Mac-final-20260521.19.zip`
+2. 把解压出来的 `Mac系统` 文件夹放到 `~/Downloads/Mac系统`
 3. 打开 `Mac系统/复制到终端运行.txt`
 4. Command + A 全选，Command + C 复制
 5. 打开「终端」，Command + V 粘贴，回车运行
