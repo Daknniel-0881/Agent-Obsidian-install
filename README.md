@@ -38,7 +38,7 @@ Windows 用户打开 PowerShell，复制下面一整行并回车：
 powershell -NoProfile -ExecutionPolicy Bypass -Command "iwr -UseBasicParsing https://raw.githubusercontent.com/Daknniel-0881/qulv-agent-obsidian-install/main/install.ps1 | iex"
 ```
 
-这两个入口都会识别当前系统并下载对应 release 资产。macOS 入口会下载完整的 `Agent-Obsidian-install-Mac-final-20260521.19.zip`，Windows 入口会下载 `Agent-Obsidian-install-Windows-final-20260521.18.zip`。
+这两个入口都会识别当前系统并下载对应 release 资产。macOS 入口会下载完整的 `Agent-Obsidian-install-Mac-final-20260521.20.zip`，Windows 入口会下载 `Agent-Obsidian-install-Windows-final-20260521.18.zip`。
 
 ## 国内网络备用命令
 
@@ -73,13 +73,13 @@ QULV_GITHUB_MIRROR_PREFIX="https://你的镜像域名/" /bin/bash -c "$(curl -fs
 
 如果一条命令不可用，可以打开本仓库右侧 Releases，下载最新版本里的资源包：
 
-- `Agent-Obsidian-install-Mac-final-20260521.19.zip`
+- `Agent-Obsidian-install-Mac-final-20260521.20.zip`
 - `Agent-Obsidian-install-Windows-final-20260521.18.zip`
 - `CHECKSUMS.txt`
 
 macOS 手动方式：
 
-1. 解压 `Agent-Obsidian-install-Mac-final-20260521.19.zip`
+1. 解压 `Agent-Obsidian-install-Mac-final-20260521.20.zip`
 2. 把解压出来的 `Mac系统` 文件夹放到 `~/Downloads/Mac系统`
 3. 打开 `Mac系统/复制到终端运行.txt`
 4. Command + A 全选，Command + C 复制
@@ -93,7 +93,7 @@ Windows 手动方式：
 
 ## 安装清单
 
-以下为当前 release `v2026.05.21.19` 的实测清单。脚本会先检测，已安装则跳过，未安装才继续安装。账号授权类工具只安装命令和 Skill，不会代替客户登录。
+以下为当前 release `v2026.05.21.20` 的实测清单。脚本会先检测，已安装则跳过，未安装才继续安装。账号授权类工具只安装命令和 Skill，不会代替客户登录。
 
 ### 系统组件、CLI 与桌面应用
 
@@ -134,18 +134,7 @@ Windows 随包文件：
 
 ### 随包 Skills
 
-macOS 当前随包 Skills：
-
-| Skill | 用途 |
-|---|---|
-| `lark-shared` | 飞书/Lark CLI 初始化、登录、身份切换、权限与安全规则 |
-| `multi-search-engine` | 多搜索引擎检索，覆盖国内外搜索源 |
-| `obsidian-cli` | 通过 Obsidian CLI 读取、创建、搜索和管理知识库 |
-| `obsidian-markdown` | Obsidian Markdown、Wiki Link、Callout、Properties 等语法 |
-| `obsidian-vault-manager` | Obsidian 知识库入库、整理、MOC 索引和工具目录维护 |
-| `search-first` | 编码或选型前先检索已有工具、库和模式 |
-
-Windows 当前随包 Skills：
+macOS / Windows 当前随包 Skills 已同步为同一批 38 个，清单先按 Windows 测试稳定版本作为标准：
 
 | 类别 | Skills |
 |---|---|

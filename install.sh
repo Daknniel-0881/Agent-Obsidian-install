@@ -3,9 +3,9 @@ set -Eeuo pipefail
 
 REPO="Daknniel-0881/qulv-agent-obsidian-install"
 BRANCH="${QULV_BRANCH:-main}"
-RELEASE_TAG="${QULV_RELEASE_TAG:-v2026.05.21.19}"
-MAC_ASSET="Agent-Obsidian-install-Mac-final-20260521.19.zip"
-MAC_SHA256="a4696ee69402ed8881dbf50e0df673368c198083f832a4c6e2288f794247da89"
+RELEASE_TAG="${QULV_RELEASE_TAG:-v2026.05.21.20}"
+MAC_ASSET="Agent-Obsidian-install-Mac-final-20260521.20.zip"
+MAC_SHA256="52ae8f2ba5191b705e94f4a0fa65f68a61627a2d350db08ccb52665558969299"
 MAC_DIR="$HOME/Downloads/Mac系统"
 
 DEFAULT_MIRRORS=(

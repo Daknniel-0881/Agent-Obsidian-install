@@ -1119,7 +1119,7 @@ main() {
   echo "  曲率 AI · Agent-Obsidian-install"
   echo "  正在安装 Agent + Obsidian + 自动化环境"
   echo "============================================================"
-  echo "脚本版本: 2026-05-21.19"
+  echo "脚本版本: 2026-05-21.20"
   echo "安装日志: $LOG_FILE"
 
   print_component_status "安装前检测" || true

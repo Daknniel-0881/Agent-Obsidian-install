@@ -1,5 +1,13 @@
 # Release Notes
 
+## v2026.05.21.20
+
+- 修复 macOS 安装包 Skills 缺失问题：把 Windows 测试稳定包里的 38 个 `payload/skills` 全量同步到 macOS 内层安装包。
+- 重新打包 `Agent-Obsidian-install-Mac-final-20260521.20.zip`，内含更新后的 `Mac系统/Agent-Obsidian-install-Mac.zip`。
+- macOS 安装脚本版本更新为 `2026-05-21.20`，默认 Obsidian 知识库路径保持为 `~/Desktop/CodePilot/Obsidian`。
+- 更新 README 安装清单：macOS / Windows 的 Skill 清单按同一批 38 个标准清单展示。
+- 更新 `install.sh`、`install.ps1` 与 `CHECKSUMS.txt`，统一指向当前 release。
+
 ## v2026.05.21.19
 
 - 发布当前测试稳定的完整 macOS 文件夹安装包：`Agent-Obsidian-install-Mac-final-20260521.19.zip`。

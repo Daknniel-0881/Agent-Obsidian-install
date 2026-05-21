@@ -1,5 +1,5 @@
 param(
-  [string]$ReleaseTag = "v2026.05.21.19",
+  [string]$ReleaseTag = "v2026.05.21.20",
   [string]$Branch = "main"
 )
 
