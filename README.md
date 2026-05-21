@@ -91,27 +91,82 @@ Windows 手动方式：
 2. 双击 `启动.bat`
 3. 保持窗口打开，按提示完成安装
 
-## 包里会安装什么
+## 安装清单
 
-安装包会尽量先检测，已安装则跳过，未安装才继续安装。不同系统实现略有差异，但当前主要覆盖：
+以下为当前 release `v2026.05.21.19` 的实测清单。脚本会先检测，已安装则跳过，未安装才继续安装。账号授权类工具只安装命令和 Skill，不会代替客户登录。
 
-- Apple Command Line Tools / Windows 基础运行环境
-- Git
-- Node.js / npm
-- Python 3.13
-- Claude Code CLI
-- Lark CLI
-- HyperFrames CLI
-- 企业微信 CLI
-- MarkItDown
-- yt-dlp
-- FFmpeg
-- CodePilot
-- Obsidian
-- Obsidian CLI 注册提示和路径配置
-- 随包 Skills 与工具目录
+### 系统组件、CLI 与桌面应用
 
-`wechat-cli` 不在默认安装清单里。
+| 项目 | macOS | Windows | 说明 |
+|---|---:|---:|---|
+| Apple Command Line Tools | 有 | 不适用 | macOS 开发基础工具 |
+| Homebrew | 有 | 不适用 | macOS 包管理器，会按网络情况选择下载源 |
+| Git | 有 | 有 | 代码与仓库基础工具 |
+| Node.js / npm | 有 | 有 | Claude Code、Lark CLI、HyperFrames 等依赖 |
+| Python 3.13 | 有 | 有 | 文档转换、下载器与 Python 工具依赖 |
+| Claude Code CLI | 有 | 有 | `claude` 命令 |
+| Lark CLI | 有 | 有 | `lark-cli` 命令，需客户自行授权 |
+| HyperFrames CLI | 无 | 有 | Windows 包安装 `hyperframes` 命令 |
+| 企业微信 CLI | 无 | 有 | Windows 包安装 `wecom-cli` 命令，需客户自行授权 |
+| MarkItDown | 无 | 有 | Windows 包安装 `markitdown[all]` |
+| yt-dlp | 无 | 有 | Windows 包安装视频/音频下载工具 |
+| reportlab | 无 | 有 | Windows 包安装，作为 `any2pdf` 的 PDF 生成依赖 |
+| FFmpeg | 无 | 有 | Windows 包内置 `ffmpeg-release-essentials.zip` 并安装 |
+| CodePilot | 有 | 有 | macOS 内置 DMG，Windows 内置 EXE |
+| Obsidian | 有 | 有 | macOS 内置 DMG，Windows 内置 EXE |
+| Obsidian CLI | 有 | 提示注册 | macOS 尝试注册命令；Windows 需在 Obsidian 内注册 |
+| 全局 `CLAUDE.md` | 有 | 有 | 写入默认知识库路径与使用规则 |
+| CodePilot 工作目录 | 有 | 有 | 创建 `CodePilot/Bridge` 与 `CodePilot/Obsidian` |
+
+### 随包应用与离线资源
+
+macOS 随包文件：
+
+- `apps/CodePilot-0.54.0-arm64.dmg`
+- `apps/CodePilot-0.54.0-x64.dmg`
+- `apps/Obsidian-1.12.7.dmg`
+
+Windows 随包文件：
+
+- `apps/CodePilot.Setup.0.54.0.exe`
+- `apps/Obsidian-1.12.7.exe`
+- `apps/ffmpeg-release-essentials.zip`
+
+### 随包 Skills
+
+macOS 当前随包 Skills：
+
+| Skill | 用途 |
+|---|---|
+| `lark-shared` | 飞书/Lark CLI 初始化、登录、身份切换、权限与安全规则 |
+| `multi-search-engine` | 多搜索引擎检索，覆盖国内外搜索源 |
+| `obsidian-cli` | 通过 Obsidian CLI 读取、创建、搜索和管理知识库 |
+| `obsidian-markdown` | Obsidian Markdown、Wiki Link、Callout、Properties 等语法 |
+| `obsidian-vault-manager` | Obsidian 知识库入库、整理、MOC 索引和工具目录维护 |
+| `search-first` | 编码或选型前先检索已有工具、库和模式 |
+
+Windows 当前随包 Skills：
+
+| 类别 | Skills |
+|---|---|
+| Agent / 安全 / 桥接 | `agent-reach`, `cc-shield`, `codexbridge`, `find-skills`, `skill-creator`, `mcp-builder`, `search-first`, `multi-search-engine`, `lengyi-recommended-skills` |
+| Obsidian 知识库 | `obsidian-vault-manager`, `obsidian-cli`, `obsidian-markdown` |
+| 飞书 / Lark | `lark-shared`, `lark-im`, `lark-doc`, `lark-drive`, `lark-sheets`, `lark-calendar`, `lark-task` |
+| 文档与格式转换 | `docx`, `pdf`, `pptx`, `xlsx`, `markitdown`, `lovstudio-any2pdf`, `markdown-mermaid-writing` |
+| 内容、设计与前端 | `article-writing`, `board`, `frontend-design`, `ui-ux-pro-max`, `guizang-ppt-skill`, `humanizer-zh` |
+| 视频与 HyperFrames | `hyperframes`, `hyperframes-cli`, `hyperframes-media`, `hyperframes-registry`, `remotion-best-practices` |
+| RSS / 微信公众号说明 | `weress` |
+
+### 随包工具源码目录
+
+当前 release 中，`payload/tools` 不是主要交付方式：
+
+- macOS 包：没有独立 `payload/tools` 工具源码目录。
+- Windows 包：`payload/tools` 目前只有 `README.md` 占位文件，没有额外工具源码目录。
+
+需要注意：`codexbridge`、`weress`、`cc-shield` 等以 Skill/说明方式随包提供，不会默认启动后台服务，不会自动读取账号、token、cookie 或聊天记录。
+
+`wechat-cli` 不在默认安装清单里，也不会自动安装。
 
 ## 隐私和账号边界
 
